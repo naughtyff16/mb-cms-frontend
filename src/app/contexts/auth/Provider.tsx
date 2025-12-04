@@ -88,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const metaRes = await getMetaConfig();
 
           console.log("User profile response:", userRes);
+          console.log("User profile response:", metaRes);
 
           const user = {
             ...userRes?.details,
@@ -147,8 +148,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userRes = await getUser();
       const metaRes = await getMetaConfig();
 
+      console.log("User profile response:", userRes);
+      console.log("User profile response:", metaRes);
+
       const user = {
-        ...userRes.data.details,
+        ...userRes?.details,
         meta: metaRes,
       };
 

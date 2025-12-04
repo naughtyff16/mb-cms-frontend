@@ -24,7 +24,7 @@ import { Avatar, Button, Input } from "@/components/ui";
 import { useDisclosure, useFuse } from "@/hooks";
 import { useThemeContext } from "@/app/contexts/theme/context";
 import { createScopedKeydownHandler } from "@/utils/dom/createScopedKeydownHandler";
-import { navigation } from "@/app/navigation";
+import { useNavigation } from "@/app/navigation";
 import { Highlight } from "@/components/shared/Highlight";
 import { settings } from "@/app/navigation/segments/settings";
 import { ColorType } from "@/constants/app";
@@ -112,9 +112,14 @@ const popular: PopularSearchItem[] = [
   },
 ];
 
-const data = flattenNav([...navigation, settings]);
+// const navigation = useNavigation();
+
+
+// const data = flattenNav([...navigation, settings]);
 
 export function Search({ renderButton }: SearchProps) {
+  const navigation = useNavigation();
+  const data = flattenNav([...navigation, settings]);
   const [isOpen, { open, close }] = useDisclosure(false);
 
   useHotkeys("/", () => open(), {
@@ -151,7 +156,7 @@ export function Search({ renderButton }: SearchProps) {
             leaveTo="opacity-0 scale-95"
           >
             <DialogPanel className="dark:bg-dark-700 relative flex h-full w-full max-w-lg origin-bottom flex-col bg-white transition-all duration-300 sm:max-h-[600px] sm:rounded-lg">
-              <SearchDialog close={close} />
+              <SearchDialog close={close} data={data}/>
             </DialogPanel>
           </TransitionChild>
         </Dialog>
@@ -162,7 +167,7 @@ export function Search({ renderButton }: SearchProps) {
   );
 }
 
-export function SearchDialog({ close }: SearchDialogProps) {
+export function SearchDialog({ close, data }: { close: () => void; data: NavigationTree[] }) {
   const { isDark } = useThemeContext();
   const searchInputId = useRef(
     `search-input-${Math.random().toString(36).substring(2, 11)}`,

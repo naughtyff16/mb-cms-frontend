@@ -5,12 +5,15 @@ import { assetByPageNumber, createDraftAssetByData, deleteAssetById, getAssetsBy
 import { useParams, useSearchParams } from "react-router";
 import { useAuthContext } from "@/app/contexts/auth/context";
 import AssetTable from "./table";
-import { Popup } from "reactjs-popup";
 import Alert from "@/components/alert";
-import { ArrowDownUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Settings, X } from "lucide-react";
+import { ArrowDownUp, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Settings } from "lucide-react";
 import MbLoader from "@/components/mbIcons/mbLoader";
 import { BreadcrumbItem, Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { capitalize } from "@/utils/capitalize";
+import PopUp from "@/components/ui/PopUp/PopUp";
+import TriggerPopUp from "@/components/ui/PopUp/TriggerPopUp";
+import AssetSearchFilters from "./searchFilter/SearchFilter";
+import { AssetPagination } from "./components/Pagination";
 
 // ----------------------------------------------------------------------
 
@@ -343,7 +346,7 @@ export default function AssetListing() {
 
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: "Asset Management", path: "/assets" },
+    { title: "Asset Management", path: "#" },
     { title: `Manage ${capitalize(type ?? "")}` },
   ];
 
@@ -358,257 +361,21 @@ export default function AssetListing() {
 
         <div className="card">
           <div className="card-body">
-            <div className="search-filters card p-4 flex items-center justify-between gap-4">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                name="search"
-                placeholder="Search or Filter anything..."
-                className="h-8 w-1/2 px-4 border border-gray-300 rounded-md grow-0"
-              />
-              <div className="flex flex-row gap-4 justify-end items-center">
-                {access?.publish &&
-                  selectedAssets.length > 0 &&
-                  selectedAssets && (
-                    <>
-                      {selectedAssets.find(
-                        (obj: any) => obj.status === "PUBLISHED"
-                      ) && (
-                          <button
-                            onClick={() => setPublishAndUnpublish("Unpublish")}
-                            className="bg-mb-blue rounded-md text-white hover:bg-mb-blue/30 hover:text-mb-blue px-4 py-2 flex items-center gap-1"
-                          >
-                            Unpublish
-                          </button>
-                        )}
-                      {selectedAssets.find(
-                        (obj: any) =>
-                          obj.status === "draft" || obj.status === "UNPUBLISHED"
-                      ) && (
-                          <button
-                            onClick={() => {
-                              for (const element of selectedAssets) {
-                                if (!checkValidations(element.data)) {
-                                  return; // Stop the loop and exit the function
-                                }
-                              }
-                              setPublishAndUnpublish("Publish");
-                            }}
-                            className="bg-mb-blue rounded-md text-white hover:bg-mb-blue/30 hover:text-mb-blue px-4 py-2 flex items-center gap-1"
-                          >
-                            Publish
-                          </button>
-                        )}
-                    </>
-                  )}
-
-                {Object.keys(assetUI).length > 0 &&
-                  Object.keys(assetTemplate).length > 0 && (
-                    <>
-                      <Popup
-                        arrow
-                        on={"click"}
-                        position={"bottom right"}
-                        trigger={
-                          <p title={`Sort`}>
-                            {" "}
-                            {/* need to add title instated of tooltip so we use <p> here */}
-                            <ArrowDownUp
-                              size={15}
-                              className="text-mb-blue cursor-pointer"
-                            ></ArrowDownUp>
-                          </p>
-                        }
-                      >
-                        <div className="w-[200px] flex flex-col gap-0 border border-gray-300 bg-white mt-2 rounded-md overflow-hidden">
-                          <div className="bg-mb-blue text-white py-1 px-2 font-bold">
-                            Choose Sort Order
-                          </div>
-                          {assetUI?.sortable?.map(
-                            (sortField: any, i: number) => {
-                              return (
-                                <div key={i}>
-                                  <div className="flex items-center gap-4  px-4 py-1">
-                                    <input
-                                      onChange={(e) =>
-                                        e.target.checked
-                                          ? setSort(`${sortField}:asc`)
-                                          : setSort("")
-                                      }
-                                      checked={sort === `${sortField}:asc`}
-                                      type="checkbox"
-                                      id={`sortable-asc-${sortField}`}
-                                    />
-                                    <label
-                                      htmlFor={`sortable-asc-${sortField}`}
-                                    >
-                                      {assetTemplate.properties[sortField].name}{" "}
-                                      ASC
-                                    </label>
-                                  </div>
-                                  <div className="flex items-center gap-4  px-4 py-1">
-                                    <input
-                                      onChange={(e) =>
-                                        e.target.checked
-                                          ? setSort(`${sortField}:desc`)
-                                          : setSort("")
-                                      }
-                                      checked={sort === `${sortField}:desc`}
-                                      type="checkbox"
-                                      id={`sortable-desc-${sortField}`}
-                                    />
-                                    <label
-                                      htmlFor={`sortable-desc-${sortField}`}
-                                    >
-                                      {assetTemplate.properties[sortField].name}{" "}
-                                      Desc
-                                    </label>
-                                  </div>
-                                </div>
-                              );
-                            }
-                          )}
-                        </div>
-                      </Popup>
-                      <Popup
-                        trigger={
-                          <p title={`Set columns`}>
-                            {" "}
-                            {/* need to add title instated of tooltip so we use <p> here */}
-                            <Settings
-                              size={15}
-                              className="text-mb-blue cursor-pointer"
-                            />
-                          </p>
-                        }
-                        arrow
-                        on={"click"}
-                        position={"bottom right"}
-                      >
-                        <div className="w-[200px] flex flex-col gap-0 border border-gray-300 bg-white mt-2 rounded-md overflow-hidden">
-                          <div className="bg-mb-blue text-white py-1 px-2 font-bold">
-                            Choose Columns
-                          </div>
-                          {assetUI?.headers?.map(
-                            (header: string, i: number) => {
-                              return (
-                                <div
-                                  key={`${i}-head`}
-                                  className="flex gap-2 items-center px-4 py-1"
-                                >
-                                  <input
-                                    id={header}
-                                    type="checkbox"
-                                    name={header}
-                                    checked={
-                                      initialHeaders.indexOf(header) > -1
-                                    }
-                                    disabled
-                                  />
-                                  <label
-                                    className="cursor-pointer"
-                                    htmlFor={header}
-                                  >
-                                    {assetTemplate.properties[header].name}
-                                  </label>
-                                </div>
-                              );
-                            }
-                          )}
-                          {assetUI?.optionalHeader?.map(
-                            (header: string, i: number) => {
-                              return (
-                                <div
-                                  key={`${i}-opt-head`}
-                                  className="flex gap-2 items-center px-4 py-1"
-                                >
-                                  <input
-                                    id={header}
-                                    onChange={manageHeaders}
-                                    checked={
-                                      initialHeaders.indexOf(header) > -1
-                                    }
-                                    name={header}
-                                    type="checkbox"
-                                  />
-                                  <label
-                                    className="cursor-pointer"
-                                    htmlFor={header}
-                                  >
-                                    {assetTemplate.properties[header].name}
-                                  </label>
-                                </div>
-                              );
-                            }
-                          )}
-                        </div>
-                      </Popup>
-                      {access?.edit && (
-                        <button
-                          onClick={() => setOpenAddPopup(true)}
-                          className="bg-mb-blue rounded-md text-white hover:bg-mb-blue/30 hover:text-mb-blue px-4 py-2 flex items-center gap-1"
-                        >
-                          Add New <Plus size={10} />{" "}
-                        </button>
-                      )}
-                      <Popup
-                        modal
-                        open={openAddPopup}
-                        onClose={() => setOpenAddPopup(false)}
-                        overlayStyle={{
-                          background: "rgba(0,0,0,0.7)",
-                          zIndex: 9999999999999,
-                        }}
-                        lockScroll
-                        closeOnDocumentClick
-                      >
-                        <div className="bg-white flex flex-col rounded-md md:w-[30rem]">
-                          <div className="flex py-2 px-4 border-b border-b-mb-blue/50 justify-between items-center">
-                            <h6>Add New</h6>
-                            <button onClick={() => setOpenAddPopup(false)}>
-                              <X size={15} />
-                            </button>
-                          </div>
-                          <div className="flex flex-col gap-2 px-4 py-8">
-                            {createError && (
-                              <p className="text-xs text-red-500">
-                                {createError}
-                              </p>
-                            )}
-                            <label htmlFor="addTitle">Title</label>
-                            <input
-                              ref={inputRef}
-                              value={createTitle}
-                              onChange={(e) => setCreateTitle(e.target.value)}
-                              type="text"
-                              className="px-1 py-2 h-10 border border-mb-blue rounded-md"
-                            />
-                          </div>
-                          <div className="flex py-2 px-4 border-t border-t-mb-blue/50 justify-end gap-4 items-center">
-                            <button
-                              className="bg-red-500 text-white rounded-md hover:bg-red-500/30 hover:text-red-500 px-4 py-2 flex items-center gap-1"
-                              onClick={() => setOpenAddPopup(false)}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              className="bg-mb-blue text-white rounded-md hover:bg-mb-blue/30 hover:text-mb-blue px-4 py-2 flex items-center gap-1"
-                              onClick={createAsset}
-                            >
-                              Submit
-                            </button>
-                          </div>
-                        </div>
-                      </Popup>
-                    </>
-                  )}
-              </div>
-            </div>
-            <div className="errors success">
+            <AssetSearchFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              setCurrentPage={setCurrentPage}
+              access={access}
+              selectedAssets={selectedAssets}
+              setPublishAndUnpublish={setPublishAndUnpublish}
+              checkValidations={checkValidations}
+              assetUI={assetUI}
+              assetTemplate={assetTemplate}
+              initialHeaders={initialHeaders}
+              manageHeaders={manageHeaders}
+              setOpenAddPopup={setOpenAddPopup}
+            />
+            <div className="">
               {success && (
                 <Alert className="relative px-4 py-3 text-sm text-green-500 border border-transparent rounded-md bg-green-50 dark:bg-green-400/20">
                   <Alert.Close className="absolute top-0 bottom-0 right-0 p-3 transition text-custom-200 hover:text-green-500 dark:text-custom-400/50 dark:hover:text-custom-500" />
@@ -641,110 +408,94 @@ export default function AssetListing() {
 
             )}
             {pagination.count > 0 && (
-              <div className="pagination-wrap">
-                <div className="flex flex-col gap-2">
-                  <p className="">
-                    Showing From {pagination.from} to {pagination.to} of{" "}
-                    {totalAssets}
-                  </p>
-                  <div className="flex gap-2">
-                    <p className="">Go to Page</p>
-                    <select
-                      className=""
-                      onChange={(e: any) => setCurrentPage(e.target.value)}
-                    >
-                      {[...Array(pagination.count).keys()]?.map((int) => (
-                        <option
-                          key={`page-${int}`}
-                          selected={currentPage === int + 1}
-                          value={int + 1}
-                        >
-                          {int + 1}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <ul className="listjs-pagination">
-                  {currentPage > 1 && (
-                    <li>
-                      <button
-                        onClick={() => setCurrentPage(1)}
-                        className="page"
-                      >
-                        <ChevronsLeft className="size-4 rtl:rotate-180" />
-                      </button>
-                    </li>
-                  )}
-                  {currentPage > 1 && (
-                    <li>
-                      <button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        className="page"
-                      >
-                        <ChevronLeft className="size-4 rtl:rotate-180" />
-                      </button>
-                    </li>
-                  )}
-                  {[...Array(pagination.count).keys()]?.map((int) => {
-                    return (
-                      int + 1 >= currentPage - 1 &&
-                      int + 1 <= currentPage + 1 && (
-                        <li className={currentPage === int + 1 ? "active" : ""}>
-                          <button
-                            onClick={() => setCurrentPage(int + 1)}
-                            className={`${currentPage === int + 1 ? "active" : ""
-                              } page`}
-                          >
-                            {int + 1}
-                          </button>
-                        </li>
-                      )
-                    );
-                  })}
-
-                  {currentPage < pagination.count && (
-                    <li>
-                      <button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        className="page"
-                      >
-                        <ChevronRight className="size-4 rtl:rotate-180" />
-                      </button>
-                    </li>
-                  )}
-                  {currentPage < pagination.count && (
-                    <li>
-                      <button
-                        onClick={() => setCurrentPage(pagination.count)}
-                        className="page"
-                      >
-                        <ChevronsRight className="size-4 rtl:rotate-180" />
-                      </button>
-                    </li>
-                  )}
-                </ul>
-              </div>
+              <AssetPagination
+                pagination={pagination}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                totalAssets={totalAssets} />
             )}
           </div>
         </div>
 
-        {/* delete Po up */}
-        <Popup
+
+        {/* PopUps */}
+
+        <PopUp
+          open={openAddPopup}
+          onClose={() => setOpenAddPopup(false)}
+        >
+          <div className="bg-white flex flex-col rounded-md md:w-[480px]">
+            <div className="flex py-2 px-4 border-b border-b-mb-blue/50 justify-between items-center">
+              <h6>Add New</h6>
+            </div>
+            <div className="flex flex-col gap-2 px-4 py-8">
+              {createError && (
+                <p className="text-xs text-red-500">
+                  {createError}
+                </p>
+              )}
+              <label htmlFor="addTitle">Title</label>
+              <input
+                ref={inputRef}
+                value={createTitle}
+                onChange={(e) => setCreateTitle(e.target.value)}
+                type="text"
+                className="px-1 py-2 h-10 border border-mb-blue rounded-md"
+              />
+            </div>
+            <div className="flex py-2 px-4 border-t border-t-mb-blue/50 justify-end gap-4 items-center">
+              <button
+                className="bg-red-500 text-white rounded-md hover:bg-red-500/30 hover:text-red-500 px-4 py-2 flex items-center gap-1"
+                onClick={() => setOpenAddPopup(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-mb-blue text-white rounded-md hover:bg-mb-blue/30 hover:text-mb-blue px-4 py-2 flex items-center gap-1"
+                onClick={createAsset}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </PopUp>
+
+        <PopUp
+          open={publishAndUnpublish !== ""}
+          onClose={handleCloseChangeStatusPopups}
+        >
+          <div className="bg-white flex flex-col rounded-md md:w-[480px]">
+            <div className="text-xl text-mb-blue border-b border-b-mb-blue font-bold p-4">
+              {publishAndUnpublish} the assets
+            </div>
+            <div className="text-sm text-gray-900 p-4">
+              Are you sure you want to {publishAndUnpublish} the selected items.
+            </div>
+            <div className="flex justify-end gap-4 p-4">
+              <button
+                className="bg-red-500 text-white rounded-md hover:bg-red-500/30 hover:text-red-500 px-4 py-2 flex items-center gap-1 "
+                onClick={handlePublishAllAssets}
+              >
+                {publishAndUnpublish}
+              </button>
+              <button
+                className="bg-gray-300 text-gray-900 rounded-md hover:bg-gray-300/30 hover:text-gray-900 px-4 py-2 flex items-center gap-1"
+                onClick={handleCloseChangeStatusPopups}
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="flex justify-end p-4">
+              {popupError && <p className="text-red-500"> {popupError}</p>}
+            </div>
+          </div>
+        </PopUp>
+
+        <PopUp
           open={openDeleteViewPopup}
           onClose={handleCloseDeletePopup}
-          modal
-          lockScroll
-          closeOnDocumentClick
-          overlayStyle={{ background: "rgba(0,0,0,0.6)", zIndex: 999999 }}
         >
-          <div className="bg-white flex flex-col rounded-md md:w-[30rem]">
-            <button
-              onClick={handleCloseDeletePopup}
-              className="absolute right-4 top-4"
-            >
-              <X size={30} />
-            </button>
+          <div className="bg-white flex flex-col rounded-md md:w-[480px]">
             <div className="text-xl text-mb-blue border-b border-b-mb-blue font-bold p-4">
               Delete Selected Item
             </div>
@@ -770,49 +521,7 @@ export default function AssetListing() {
               {popupError && <p className="text-red-500"> {popupError}</p>}
             </div>
           </div>
-        </Popup>
-
-        {/* publish and un-publish  Po up */}
-        <Popup
-          open={publishAndUnpublish !== ""}
-          onClose={handleCloseChangeStatusPopups}
-          modal
-          lockScroll
-          closeOnDocumentClick
-          overlayStyle={{ background: "rgba(0,0,0,0.6)", zIndex: 999999 }}
-        >
-          <div className="bg-white flex flex-col rounded-md md:w-[30rem]">
-            <button
-              onClick={handleCloseChangeStatusPopups}
-              className="absolute right-4 top-4"
-            >
-              <X size={30} />
-            </button>
-            <div className="text-xl text-mb-blue border-b border-b-mb-blue font-bold p-4">
-              {publishAndUnpublish} the assets
-            </div>
-            <div className="text-sm text-gray-900 p-4">
-              Are you sure you want to {publishAndUnpublish} the selected items.
-            </div>
-            <div className="flex justify-end gap-4 p-4">
-              <button
-                className="bg-red-500 text-white rounded-md hover:bg-red-500/30 hover:text-red-500 px-4 py-2 flex items-center gap-1 "
-                onClick={handlePublishAllAssets}
-              >
-                {publishAndUnpublish}
-              </button>
-              <button
-                className="bg-gray-300 text-gray-900 rounded-md hover:bg-gray-300/30 hover:text-gray-900 px-4 py-2 flex items-center gap-1"
-                onClick={handleCloseChangeStatusPopups}
-              >
-                Cancel
-              </button>
-            </div>
-            <div className="flex justify-end p-4">
-              {popupError && <p className="text-red-500"> {popupError}</p>}
-            </div>
-          </div>
-        </Popup>
+        </PopUp>
 
         {loading && <MbLoader />}
       </div>

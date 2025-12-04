@@ -5,16 +5,17 @@ import SimpleBar from "simplebar-react";
 
 // Local Imports
 import { useDidUpdate } from "@/hooks";
-import { navigation } from "@/app/navigation";
 import { Accordion } from "@/components/ui";
 import { isRouteActive } from "@/utils/isRouteActive";
 import { Group } from "./Group";
+import { useNavigation } from "@/app/navigation";
 
 // ----------------------------------------------------------------------
 
 export function Menu() {
   const { pathname } = useLocation();
   const ref = useRef<HTMLDivElement | null>(null);
+  const navigation = useNavigation();
 
   const activeGroup = navigation.find((item) => {
     if (item.path) return isRouteActive(item.path, pathname);

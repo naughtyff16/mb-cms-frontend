@@ -5,7 +5,7 @@ import { useLocation } from "react-router";
 // Local Imports
 import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
 import { useSidebarContext } from "@/app/contexts/sidebar/context";
-import { navigation } from "@/app/navigation";
+import { useNavigation } from "@/app/navigation";
 import { useDidUpdate } from "@/hooks";
 import { isRouteActive } from "@/utils/isRouteActive";
 import { MainPanel } from "./MainPanel";
@@ -19,6 +19,8 @@ export function Sidebar() {
   const { pathname } = useLocation();
   const { name, lgAndDown } = useBreakpointsContext();
   const { isExpanded, close } = useSidebarContext();
+    const navigation = useNavigation();
+  
 
   const initialSegment = useMemo(
     () => navigation.find((item) => isRouteActive(item.path, pathname)),

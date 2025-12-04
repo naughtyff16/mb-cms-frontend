@@ -1,0 +1,24 @@
+const MbLoader = ()=>{
+    return(
+
+        <div className="w-full h-full flex flex-col items-center justify-center grow">
+        <svg className="w-20 h-20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g>
+        <path style={{animationDelay:`0s`}} className="animate-ping delay-0" d="M0 1.49999C0 1.29999 0 1.19999 0.1 1.09999C5.3 -1.60001 12.1 0.399992 12.1 9.49999C12.1 18.8 12.1 27.2 12.1 31.6C12.1 35.8 14.8 37.4 15 37.5C12.2 40.1 1 43.9 1 29.6C1 21.5 1 13.8 1 9.69999C1 5.69999 1 3.99999 0 1.49999Z" fill="#DA1A5D"/>
+        <path style={{animationDelay:`0s`}} className="animate-ping delay-75" d="M19.7 4.70001C23 4.70001 26 7.10001 26 12.6C26 20.3 26 25.5 26 29.1C26 32.6 28.2 33.9 28.4 34C25.9 36.3 16.8 38 16.8 27.5C16.8 20.8 16.8 16.2 16.8 12.8C16.8 9.40001 16.8 8.10001 16 5.90001C16.9 5.10001 18.4 4.70001 19.7 4.70001Z" fill="#457ABD"/>
+        <path style={{animationDelay:`0s`}} className="animate-ping delay-100" d="M32.9 10.1C35.8 10 38.5 12.1 38.4 17C38.2 23.5 38.2 23.5 38 26.5C37.9 29.4 39.7 30.5 39.8 30.6C38.3 33.4 30 33.6 30.3 24.8C30.5 19.1 30.5 19.6 30.6 16.8C30.7 14 30.8 12.8 30.1 10.9C30.7 10.4 32.1 10.2 32.9 10.1Z" fill="#AACF37"/>
+        </g>
+        <defs>
+        <clipPath id="clip0_402_51503">
+        <rect width="40" height="40" fill="white"/>
+        </clipPath>
+        </defs>
+        </svg>
+        <p>Loading ...</p>
+      </div>
+        
+    )
+    
+    }
+    
+    export default MbLoader

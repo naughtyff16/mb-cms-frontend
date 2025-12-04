@@ -27,6 +27,17 @@
       "widget-ui": "Widget UI",
       "widget-contact": "Widget Contact"
     },
+    "assets": {
+      "content_management": "Content Management",
+      "content": "Content",
+      "movies": "Movies",
+      "series": "Series",
+      "seasons": "Seasons",
+      "episodes": "Episodes",
+      "channels": "Channels",
+      "videos": "Videos",
+      "generic": "Generic"
+    },
     "apps": {
       "apps": "Apps",
       "chat": "Chat",

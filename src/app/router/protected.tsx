@@ -724,6 +724,23 @@ const protectedRoutes: RouteObject = {
             },
           ],
         },
+
+        {
+          path: "/assets",
+          children: [
+            {
+              index: true,
+              element: <Navigate to="/assets/movies" />,
+            },
+            {
+              path: ":type",
+              lazy: async () => ({
+                Component: (await import("@/app/pages/assets/index")).default,
+              }),
+            },
+          ],
+        },
+        
         {
           path: "dashboards",
           children: [

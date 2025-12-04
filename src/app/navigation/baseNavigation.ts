@@ -9,6 +9,14 @@ export const baseNavigationObj: Record<string, NavigationTree> = {
     transKey: "nav.dashboards.dashboards",
     icon: "dashboards",
   },
+  assets: {
+    id: "assets",
+    type: "item",
+    path: "/assets",
+    title: "Assets",
+    transKey: "nav.assets.assets",
+    icon: "prototypes",
+  },
   apps: {
     id: "apps",
     type: "item",
